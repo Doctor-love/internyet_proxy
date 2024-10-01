@@ -161,7 +161,7 @@ func newReverseProxy(targetURL *url.URL, addHSTS bool) *httputil.ReverseProxy {
 		}
 
 		// Lazily extract alias/ID from peer certificate - probably broken!
-		clientAliasRaw := req.TLS.PeerCertificates[len(req.TLS.PeerCertificates) - 1].Subject.String()
+		clientAliasRaw := req.TLS.VerifiedChains[0][0].Subject.String()
 		clientAliasParts := strings.Split(clientAliasRaw, "@")
 		clientAlias := strings.TrimPrefix(clientAliasParts[0], "CN=")
 
