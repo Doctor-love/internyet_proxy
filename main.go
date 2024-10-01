@@ -6,7 +6,6 @@ import (
 	"crypto/x509/pkix"
 	"flag"
 	"fmt"
-	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -151,14 +150,8 @@ func newReverseProxy(targetURL *url.URL, addHSTS bool) *httputil.ReverseProxy {
 			req.Header.Set("User-Agent", "")
 		}
 
-		// Set/Prevent spoofing of XFF
+		// Prevent spoofing of XFF
 		req.Header.Del("X-Forwarded-For")
-		req.Header.Del("X-Real-IP")
-
-		clientAddress, _, err := net.SplitHostPort(req.RemoteAddr)
-		if err == nil {
-			req.Header.Set("X-Forwarded-For", clientAddress)
-		}
 
 		// Lazily extract alias/ID from peer certificate - probably broken!
 		clientAliasRaw := req.TLS.VerifiedChains[0][0].Subject.String()
