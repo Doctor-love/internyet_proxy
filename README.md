@@ -4,13 +4,15 @@
 
 ## Introduction
 Slap this proxy in front of your web server and let it handles HTTPS and
-client certificate authentication. Provides the client's/participant's
-alias in the HTTP header "X-Internyet-Client-Alias" - could be useful,
-albeit a bit fragile.
+client certificate authentication. Provides the participant's alias in the HTTP
+header "X-Internyet-Client-Alias". If the participant is a member of any great
+houses, you'll find them as a comma-separated list in the
+"X-Internyet-Client-Great-Houses" header. Could be useful, albeit a bit
+fragile.
   
 For building instructions, have a look at the Dockerfile.  
   
-Based on [certainly](https://github.com/Doctor-love/certainly), but
+Based on [certainly](https://github.com/doctor-love/certainly), but
 slightly adapted for internyet.party. If you're not at the party,
 it makes little sense using it.
 

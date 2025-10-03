@@ -2,17 +2,17 @@
 # CGO_ENABLED=0 GOOS=linux go build -a -tags netgo -ldflags '-w -extldflags "-static"'
 #
 [Unit]
-Description=Reverse HTTP proxy with mutual TLS authentication for %i
+Description=Reverse HTTP proxy with mutual TLS authentication
 After=network.target
  
 [Service]
 # File containing environment variable definition, used as configuration for the instance 
-EnvironmentFile=/etc/certainly/%i.conf
+EnvironmentFile=/etc/internyet.env
 
 Type=simple
-User=certainly
-Group=certainly
-ExecStart=/usr/bin/certainly -env
+User=internyet
+Group=internyet
+ExecStart=/usr/local/bin/internyet_proxy -env
 Restart=on-failure
  
 RemoveIPC=true
@@ -32,7 +32,7 @@ SystemCallFilter=~@chown @clock @cpu-emulation @debug @file-system @ipc @keyring
 # Since InaccessiblePaths cant be nested with ReadOnlyPaths, we need to attempt some blacklisting
 InaccessiblePaths=/bin /boot /home /lib /media /mnt /opt /root /run/user /sbin /srv /tmp /var
 TemporaryFileSystem=/etc:ro
-BindReadOnlyPaths=/etc/certainly /etc/ssl/certs /etc/localtime /etc/hosts /etc/resolv.conf
+BindReadOnlyPaths=/etc/internyet.env /etc/ssl/certs /etc/localtime /etc/hosts /etc/resolv.conf
  
 [Install]
 WantedBy=multi-user.target

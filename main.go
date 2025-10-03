@@ -150,16 +150,29 @@ func newReverseProxy(targetURL *url.URL, addHSTS bool) *httputil.ReverseProxy {
 			req.Header.Set("User-Agent", "")
 		}
 
-		// Prevent spoofing of XFF
+		// Prevent spoofing of XFF and other headers
 		req.Header.Del("X-Forwarded-For")
+		req.Header.Del("X-Internyet-Client-Alias")
+		req.Header.Del("X-Internyet-Client-Great-Houses")
 
 		// Lazily extract alias/ID from peer certificate - probably broken!
-		clientAliasRaw := req.TLS.VerifiedChains[0][0].Subject.String()
-		clientAliasParts := strings.Split(clientAliasRaw, "@")
-		clientAlias := strings.TrimPrefix(clientAliasParts[0], "CN=")
+		clientSubject := req.TLS.VerifiedChains[0][0].Subject
 
-		req.Header.Del("X-Internyet-Client-Alias")
-		req.Header.Set("X-Internyet-Client-Alias", clientAlias)
+		clientAliasParts := strings.Split(clientSubject.CommonName, "@")
+
+		if clientAliasParts[1] != "p.nyet" {
+			log.Print("WARN: Client tried to authenticate using group/shared certificate")
+			return
+		}
+
+		req.Header.Set("X-Internyet-Client-Alias", clientAliasParts[0])
+
+		clientGreatHousesRaw := clientSubject.OrganizationalUnit[0]
+
+		if strings.HasPrefix(clientGreatHousesRaw, "Great houses: ") {
+			clientGreatHouses := strings.TrimPrefix(clientGreatHousesRaw, "Great houses: ")
+			req.Header.Set("X-Internyet-Client-Great-Houses", clientGreatHouses)
+		}
 	}
 
 	// Modification of proxied responses returned from target URL
